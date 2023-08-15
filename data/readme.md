@@ -1,4 +1,3 @@
-# final project - Taylor Nguyen
 # Hot Ones Episodes 
 
 The data this week comes from Wikipedia articles: [*Hot Ones*](https://en.wikipedia.org/wiki/Hot_Ones) and [List of Hot Ones episodes](https://en.wikipedia.org/wiki/List_of_Hot_Ones_episodes). Thank you to [Carl Börstell](https://github.com/borstell) for the [suggestion and cleaning script](https://github.com/rfordatascience/tidytuesday/issues/591)!
