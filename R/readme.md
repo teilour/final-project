@@ -14,7 +14,7 @@ sauces_col <- c("season", "sauce_number", "sauce_name", "scoville")
 							 
 sauces <- read_csv(here::here("data", "raw", "sauces.csv"),
 								 skip = 1, col_names = sauces_col) |>
-	mutate(saucenum_cat = factor(sauce_number, labels = (1:10)),
+	mutate(saucenum = factor(sauce_number, labels = (1:10)),
 				 season = factor(season, labels = c("Season 1", "Season 2", "Season 3", "Season 4", "Season 5",
 																					"Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
 																					"Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
@@ -27,15 +27,15 @@ sauces <- read_csv(here::here("data", "raw", "sauces.csv"),
 tbl_summary(
 	sauces,
 	by = season,
-	include = c(season, saucenum_cat, sauce_name, scoville))
+	include = c(season, saucenum, sauce_name, scoville))
 
 
 tbl_summary(
 	sauces,
 	by = season,
-	include = c(season, saucenum_cat, sauce_name, scoville),
+	include = c(season, saucenum, sauce_name, scoville),
 	label = list(
-		seasonnum_cat ~ "Number of Season",
+		seasonnum ~ "Number of Season",
 		sauce_name ~ "Sauce Name",
 		scoville ~ "Scoville"
 		),
@@ -45,12 +45,12 @@ tbl_summary(
 tbl_summary(
 	sauces,
 	by = season,
-	include = c(season, saucenum_cat, sauce_name, scoville),
+	include = c(season, saucenum, sauce_name, scoville),
 	label = list(
-	  season ~ "Season",
-		seasonnum_cat ~ "Number of Season",
+		seasonnum ~ "Season Number",
 		sauce_name ~ "Sauce Name",
-		scoville ~ "Scoville"), 
+		scoville ~ "Scoville"
+		), 
 		missing_text = "Missing") |>
 	add_p(test = list(all_continuous() ~ "t.test",
 										all_categorical() ~ "chisq.test")) |>
