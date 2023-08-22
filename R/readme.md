@@ -1,8 +1,9 @@
 # Install and load packages
+install.packages("here")
+install.packages("gtsummary")
+
 library(tidyverse)
 library(gtsummary)
-
-install.packages("here")
 
 
 # Read in data to R
@@ -10,8 +11,11 @@ sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytu
 view(sauce_data)
 
 
+# column names
 sauces_col <- c("season", "sauce_number", "sauce_name", "scoville")
-							 
+
+
+# read in raw data				 
 sauces <- read_csv(here::here("data", "raw", "sauces.csv"),
 								 skip = 1, col_names = sauces_col) |>
 	mutate(saucenum = factor(sauce_number, labels = (1:10)),
@@ -20,7 +24,15 @@ sauces <- read_csv(here::here("data", "raw", "sauces.csv"),
 																					"Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
 																					"Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
 																					"Season 21")))
-
+																					
+> sauces_cat <- sauces |>
+	mutate(saucenum = factor(sauce_number, labels = (1:10)),
+				 season_cat = factor(season, labels = c("Season 1", "Season 2", "Season 3", "Season 4", "Season 5",
+																							"Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
+																							"Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
+																							"Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
+																							"Season 21")))
+																						
 
 # Customization of `tbl_summary()`
 
@@ -43,18 +55,99 @@ tbl_summary(
 
 
 tbl_summary(
-	sauces,
-	by = season,
-	include = c(season, saucenum, sauce_name, scoville),
+ 	sauces,
+ 	by = season,
+ 	include = c(season, saucenum, sauce_name, scoville),
+ 	label = list(
+ 		seasonnum ~ "Season Number",
+ 		sauce_name ~ "Sauce Name",
+ 		scoville ~ "Scoville") |>
+ 	add_p(test = list(all_continuous() ~ "t.test",
+										all_categorical() ~ "chisq.test")) |>
+	add_overall(col_label = "**Total**") |>
+ 	bold_labels() |>
+ 	modify_footnote(update = everything() ~ NA) |>
+ 	modify_header(label = "**Variable**"), p.value(label = "**P**"))
+
+	
+> sauces %>%
+	select(season, saucenum, sauce_name, scoville) %>%
+	tbl_summary(by = season,
+	  					missing = "no") %>%
 	label = list(
 		seasonnum ~ "Season Number",
 		sauce_name ~ "Sauce Name",
 		scoville ~ "Scoville"
-		), 
-		missing_text = "Missing") |>
+		) %>%
 	add_p(test = list(all_continuous() ~ "t.test",
-										all_categorical() ~ "chisq.test")) |>
-	add_overall(col_label = "**Total**") |>
-	bold_labels() |>
-	modify_footnote(update = everything() ~ NA) |>
-	modify_header(label = "**Variable**", p.value = "**P**")
+										all_categorical() ~ "chisq.test")) %>%
+	add_overall(col_label = "**Total**") %>%
+	add_n() %>%
+	bold_labels() %>%
+	modify_header(label = "**Variable**", p.value = "**p**")
+	
+> saucy <-
+	sauces %>%
+	select(season, saucenum, sauce_name, scoville) %>%
+	tbl_summary(
+		by = season, 
+		statistic = list(all_continuous() ~ "t.test",
+										 all_categorical() ~ "chisq.test"),
+		type = all_categorical() ~ "Categorical",
+		label = list(
+			season ~ "Season",
+			seasonnum ~ "Season Number",
+			sauce_name ~ "Sauce Name",
+			scoville ~ "Scoville"),
+		missing_test = "Missing"
+	)
+
+
+# Univariate regression
+tbl_uvregression(
+	sauces,
+	y = scoville,
+	include = c(season, saucenum, sauce_name, scoville),
+	method = lm)
+	
+# Multivariable regressions
+linear_model <- lm(scoville ~ season + saucenum + sauce_name,
+									 data = sauces)
+									 
+linear_model_int <- lm(scoville ~ season*saucenum + sauce_name,
+											 data = sauces)
+
+# Regression
+tbl_regression(
+	linear_model,
+	intercept = TRUE,
+	label = list(
+		season ~ "Season",
+		saucenum ~ "Sauce Number",
+		sauce_name ~ "Sauce Name"
+	))
+
+
+tbl_no_int <- tbl_regression(
+  linear_model, 
+  intercept = TRUE,
+  label = list(
+  	season ~ "Season",
+		saucenum ~ "Sauce Number",
+		sauce_name ~ "Sauce Name"
+	))
+
+> tbl_int <- tbl_regression(
+   linear_model_int, 
+   intercept = TRUE,
+   label = list(
+ 		season ~ "Season",
+ 		saucenum ~ "Sauce Number",
+ 		sauce_name ~ "Sauce Name",
+ 		`season:sauce_name` ~ "Season/Sauce Name Interaction"
+ 	))
+
+> tbl_merge(list(tbl_no_int, tbl_int), 
+          tab_spanner = c("**Model 1**", "**Model 2**"))
+
+
