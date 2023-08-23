@@ -1,10 +1,20 @@
 # Install and load packages
 install.packages("here")
 install.packages("gtsummary")
+install.packages("renv")
 
 library(tidyverse)
 library(gtsummary)
+library(broom)
 
+
+# Renv
+renv::init()
+renv::snapshot()
+source("renv/activate.R")
+
+renv::restore()
+renv::status()
 
 # Read in data to R
 sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
@@ -151,3 +161,59 @@ tbl_no_int <- tbl_regression(
           tab_spanner = c("**Model 1**", "**Model 2**"))
 
 
+# Series of univariate regressions
+scoville_table <- tbl_uvregression(
+  sauces,
+  y = scoville,
+  include = c(
+    season, saucenum, sauce_name
+  ),
+  method = lm
+)
+scoville_table
+
+
+> inline_text(scoville_table, variable = "saucenum")
+
+
+> logistic_model <- glm(sauce_name ~ season + saucenum + scoville,
+											data = sauces, family = binomial())
+> tidy(logistic_model, conf.int = TRUE, exponentiate = TRUE)
+
+# Using broom to combine regressions
+mod_szn_cat <- lm(scoville ~ season, data = sauces)
+summary(mod_szn_cat)
+mod_saucenum_cat <- lm(scoville ~ saucenum, data = sauces)
+mod_sauce_name_cat <- lm(scoville ~ sauce_name, data = sauces)
+
+tidy_szn_cat <- tidy(mod_szn_cat, conf.int = TRUE)
+tidy_saucenum_cat <- tidy(mod_saucenum_cat, conf.int = TRUE)
+tidy_sauce_name_cat <- tidy(mod_sauce_name_cat, conf.int = TRUE)
+
+dplyr::bind_rows(
+	season = tidy_szn_cat,
+	saucenum = tidy_saucenum_cat,
+	sauce_name = tidy_sauce_name_cat, .id = "model") |>
+	dplyr::mutate(
+	term = stringr::str_remove(term, model),
+	term = ifelse(term == "", model, term))
+	
+> tidy(logistic_model, conf.int = TRUE, exponentiate = TRUE) |>
+	tidycat::tidy_categorical(logistic_model, exponentiate = TRUE)
+	dplyr::select(-c(3:5))
+	
+
+# Figure
+hist(sauces$scoville)
+
+
+# Function
+x <- c(450, 550, 600, 747, 1600)
+new_mean <- function(x) {
+	n <- length(x)
+	mean_val <- sum(x) / n
+	return(mean_val)
+}
+
+new_mean(x = x)
+new_mean(x = c(450, 600, 1600))
