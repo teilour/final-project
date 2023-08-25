@@ -40,6 +40,7 @@ renv::status()
 sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
 view(sauce_data)
 
+The sauces dataset involves Hot Ones sauces that have been tried over the 21 seasons and their Scoville Heat Unit.
 																					
 # Customization of `tbl_summary()`
 
@@ -131,12 +132,16 @@ tbl_summary(
  	
 # Univariate regression
 ```{r}
-tbl_uvregression(
+#| label: regress
+#| tbl-cap: "Regression Results"
+regress1 <- tbl_uvregression(
 	sauces,
 	y = scoville,
 	include = c(season, saucenum, sauce_name, scoville),
 	method = lm)
+regress1
 ```
+@regress is a univariate regression for the sauces dataset	
 	
 # Multivariable regressions
 ```{r}
@@ -188,4 +193,3 @@ tbl_merge(list(tbl_no_int, tbl_int),
           tab_spanner = c("**Model 1**", "**Model 2**"))
 ```
 	
-
