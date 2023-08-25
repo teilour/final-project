@@ -12,6 +12,7 @@ here::here()
 install.packages("here")
 install.packages("gtsummary")
 install.packages("renv")
+install.packages("yaml")
 
 library(tidyverse)
 library(gtsummary)
