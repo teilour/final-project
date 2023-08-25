@@ -43,13 +43,17 @@ view(sauce_data)
 																					
 # Customization of `tbl_summary()`
 
+```{r}
 tbl_summary(
 	sauces,
 	by = season,
 	include = c(season, saucenum, sauce_name, scoville))
+```
 
-
-tbl_summary(
+```{r}
+#| label: tbl-one
+#| tbl-cap: "Hot Ones Sauces Over the Seasons"
+table1 <- tbl_summary(
 	sauces,
 	by = season,
 	include = c(season, saucenum, sauce_name, scoville),
@@ -59,8 +63,24 @@ tbl_summary(
 		scoville ~ "Scoville"
 		),
 		missing_text = "Missing")
+table1
+```
+@tbl-one looks at different sauces used for each Hot Ones season
 
+```{r}
+scoville_szn <- inline_text(table1, variable = "Scoville", 
+                        						 column = "Season")
+scoville_saucename <- inline_text(table1, variable = "Scoville", 
+                        						 column = "Sauce Name")
+```
+A greater proportion of season (`r scoville_szn`) than sauce name (`r scoville_saucename`) had more scoville.
 
+```{r}
+scoville_avg <- mean(sauces$scoville, na.rm = TRUE)
+```
+The average amount of scoville was 'r scoville_avg'
+
+```{r}
 tbl_summary(
  	sauces,
  	by = season,
@@ -75,22 +95,31 @@ tbl_summary(
  	bold_labels() |>
  	modify_footnote(update = everything() ~ NA) |>
  	modify_header(label = "**Variable**"), p.value(label = "**P**"))
+```
  	
 # Univariate regression
+```{r}
 tbl_uvregression(
 	sauces,
 	y = scoville,
 	include = c(season, saucenum, sauce_name, scoville),
 	method = lm)
+```
 	
 # Multivariable regressions
+```{r}
 linear_model <- lm(scoville ~ season + saucenum + sauce_name,
 									 data = sauces)
-									 
+```
+
+```{r}									 
 linear_model_int <- lm(scoville ~ season*saucenum + sauce_name,
 											 data = sauces)
+```
 
-# Regression
+# Regression Tables
+
+```{r}
 tbl_regression(
 	linear_model,
 	intercept = TRUE,
@@ -99,8 +128,9 @@ tbl_regression(
 		saucenum ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
+```
 
-
+```{r}
 tbl_no_int <- tbl_regression(
   linear_model, 
   intercept = TRUE,
@@ -109,56 +139,21 @@ tbl_no_int <- tbl_regression(
 		saucenum ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
-	
-# Series of univariate regressions
-scoville_table <- tbl_uvregression(
-  sauces,
-  y = scoville,
-  include = c(
-    season, saucenum, sauce_name
-  ),
-  method = lm
-)
-scoville_table
 
-# Using broom to combine regressions
-mod_szn_cat <- lm(scoville ~ season, data = sauces)
-summary(mod_szn_cat)
-mod_saucenum_cat <- lm(scoville ~ saucenum, data = sauces)
-mod_sauce_name_cat <- lm(scoville ~ sauce_name, data = sauces)
-
-tidy_szn_cat <- tidy(mod_szn_cat, conf.int = TRUE)
-tidy_saucenum_cat <- tidy(mod_saucenum_cat, conf.int = TRUE)
-tidy_sauce_name_cat <- tidy(mod_sauce_name_cat, conf.int = TRUE)
-
-dplyr::bind_rows(
-	season = tidy_szn_cat,
-	saucenum = tidy_saucenum_cat,
-	sauce_name = tidy_sauce_name_cat, .id = "model") |>
-	dplyr::mutate(
-	term = stringr::str_remove(term, model),
-	term = ifelse(term == "", model, term))
-
-# Figure
-hist(sauces$scoville)
-
-
-# Function
-x <- c(450, 550, 600, 747, 1600)
-new_mean <- function(x) {
-	n <- length(x)
-	mean_val <- sum(x) / n
-	return(mean_val)
-}
-
-new_mean(x = x)
-new_mean(x = c(450, 600, 1600))
-
-install.packages("rmarkdown")
-library(knitr)
-```{r}
-#| label: tbl-one
-#| tbl-cap: "Hot Ones Sauces Over the Seasons"
-knitr::kable(sauces)
+tbl_int <- tbl_regression(
+   linear_model_int, 
+   intercept = TRUE,
+   label = list(
+ 		season ~ "Season",
+ 		saucenum ~ "Sauce Number",
+ 		sauce_name ~ "Sauce Name",
+ 		`season:sauce_name` ~ "Season/Sauce Name Interaction"
+ 	))
 ```
+
+```{r}
+tbl_merge(list(tbl_no_int, tbl_int), 
+          tab_spanner = c("**Model 1**", "**Model 2**"))
+```
+	
 
