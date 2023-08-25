@@ -68,6 +68,30 @@ table1
 @tbl-one looks at different sauces used for each Hot Ones season
 
 ```{r}
+#| label: tbl-one
+#| tbl-cap: "The table displays Hot Ones sauces over the seasons"
+knitr::kable(sauces)
+```
+
+```{r}
+#| label: tbl-two
+#| tbl-cap: "Descriptive Statistics"
+table2 <- tbl_summary(
+	sauces,
+	by = season,
+	include = c(season, saucenum, sauce_name, scoville)) |>
+	add_overall(last = TRUE)
+table2
+```
+
+```{r}
+#| label: fig-hist
+#| fig-cap: "This is a histogram of Hot Ones sauces"
+hist(sauces$scoville)
+```
+@fig-hist contains a histogram of Hot Ones sauces and @tbl-one a table of Hot Ones sauces over the seasons.
+
+```{r}
 scoville_szn <- inline_text(table1, variable = "Scoville", 
                         						 column = "Season")
 scoville_saucename <- inline_text(table1, variable = "Scoville", 
@@ -75,10 +99,18 @@ scoville_saucename <- inline_text(table1, variable = "Scoville",
 ```
 A greater proportion of season (`r scoville_szn`) than sauce name (`r scoville_saucename`) had more scoville.
 
+A greater proportion of season (`r inline_text(table1, variable = "Scoville", column = "Season")`) than sauce name (`r inline_text(table1, variable = "Scoville", column = "Sauce Name")`) had more scoville.
+
+There were `r 200 + 10` participants 
+
 ```{r}
 scoville_avg <- mean(sauces$scoville, na.rm = TRUE)
 ```
 The average amount of scoville was 'r scoville_avg'
+
+sauce_stats <- list(n = nrow(sauces),
+										scoville_avg = mean(sauces$scoville))
+There were `r sauce_stats$n` sauces with a mean scoville of `r sauce_stats$scoville_avg`.
 
 ```{r}
 tbl_summary(
