@@ -2,6 +2,7 @@
 install.packages("here")
 install.packages("gtsummary")
 install.packages("renv")
+install.packages("yaml")
 
 library(tidyverse)
 library(gtsummary)
@@ -13,8 +14,6 @@ renv::init()
 renv::snapshot()
 source("renv/activate.R")
 
-renv::restore()
-renv::status()
 
 # Read in data to R
 sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
