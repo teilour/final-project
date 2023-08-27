@@ -7,13 +7,9 @@ format: html
 ```{r}
 here::here()
 ```
-# Install and load packages
-```{r}
-install.packages("here")
-install.packages("gtsummary")
-install.packages("renv")
-install.packages("yaml")
 
+# Load packages
+```{r}
 library(tidyverse)
 library(gtsummary)
 library(broom)
@@ -60,6 +56,7 @@ table1 <- tbl_summary(
 	by = season,
 	include = c(season, saucenum, sauce_name, scoville),
 	label = list(
+		season ~ "Season",
 		seasonnum ~ "Number of Season",
 		sauce_name ~ "Sauce Name",
 		scoville ~ "Scoville"
@@ -67,13 +64,8 @@ table1 <- tbl_summary(
 		missing_text = "Missing")
 table1
 ```
-@tbl-one looks at different sauces used for each Hot Ones season
+@tbl-one looks at different sauces used for each Hot Ones season.
 
-```{r}
-#| label: tbl-one
-#| tbl-cap: "The table displays Hot Ones sauces over the seasons"
-knitr::kable(sauces)
-```
 
 ```{r}
 #| label: tbl-two
@@ -91,7 +83,7 @@ table2
 #| fig-cap: "This is a histogram of Hot Ones sauces"
 hist(sauces$scoville)
 ```
-@fig-hist contains a histogram of Hot Ones sauces and @tbl-one a table of Hot Ones sauces over the seasons.
+@fig-hist contains a histogram of Hot Ones sauces and @tbl-one is a table of Hot Ones sauces over the seasons.
 
 ```{r}
 scoville_szn <- inline_text(table1, variable = "Scoville", 

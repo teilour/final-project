@@ -3,10 +3,12 @@ install.packages("here")
 install.packages("gtsummary")
 install.packages("renv")
 install.packages("yaml")
+install.packages("usethis")
 
 library(tidyverse)
 library(gtsummary)
 library(broom)
+usethis::use_readme_rnd
 
 
 # Renv
