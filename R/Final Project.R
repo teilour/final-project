@@ -8,14 +8,6 @@ install.packages("usethis")
 library(tidyverse)
 library(gtsummary)
 library(broom)
-usethis::use_readme_rnd
-
-
-
-# Renv
-renv::init()
-renv::snapshot()
-source("renv/activate.R")
 
 
 
@@ -79,6 +71,7 @@ tbl_summary(
 	modify_header(label = "**Variable**")
 
 
+
 # Univariate regression
 tbl_uvregression(
 	sauces,
@@ -87,45 +80,45 @@ tbl_uvregression(
 	method = lm)
 
 
+
 # Multivariable regressions
-linear_model <- lm(scoville ~ season + saucenum + sauce_name,
+linear_model <- lm(scoville ~ season + sauce_number + sauce_name,
 									 data = sauces)
 
-linear_model_int <- lm(scoville ~ season*saucenum + sauce_name,
+linear_model_int <- lm(scoville ~ season*sauce_number + sauce_name,
 											 data = sauces)
 
-# Regression
 tbl_regression(
 	linear_model,
 	intercept = TRUE,
 	label = list(
 		season ~ "Season",
-		saucenum ~ "Sauce Number",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
-
 
 tbl_no_int <- tbl_regression(
 	linear_model,
 	intercept = TRUE,
 	label = list(
 		season ~ "Season",
-		saucenum ~ "Sauce Number",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
 
-> tbl_int <- tbl_regression(
+tbl_int <- tbl_regression(
 	linear_model_int,
 	intercept = TRUE,
 	label = list(
 		season ~ "Season",
-		saucenum ~ "Sauce Number",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name",
-		`season:sauce_name` ~ "Season/Sauce Name Interaction"
+		`season:sauce_number` ~ "Season/Sauce Number interaction"
 	))
 
-> tbl_merge(list(tbl_no_int, tbl_int),
+tbl_merge(list(tbl_no_int, tbl_int),
 						tab_spanner = c("**Model 1**", "**Model 2**"))
+
 
 
 # Series of univariate regressions
@@ -133,49 +126,57 @@ scoville_table <- tbl_uvregression(
 	sauces,
 	y = scoville,
 	include = c(
-		season, saucenum, sauce_name
+		season, sauce_number, sauce_name, scoville
 	),
 	method = lm
 )
 scoville_table
 
 
-> inline_text(scoville_table, variable = "saucenum")
+inline_text(scoville_table, variable = "season")
+
+mod_season <- lm(scoville ~ season, data = sauces)
+summary(mod_season)
 
 
-> logistic_model <- glm(sauce_name ~ season + saucenum + scoville,
-												data = sauces, family = binomial())
-> tidy(logistic_model, conf.int = TRUE, exponentiate = TRUE)
+
+# {broom} functions
+augment(mod_season)
+glance(mod_season)
+tidy(mod_season, conf.int = TRUE)
+
+linear_model <- lm(scoville ~ season + sauce_number + sauce_name,
+									 data = sauces)
+tidy(linear_model, conf.int = TRUE, exponentiate = TRUE)
+
+
 
 # Using broom to combine regressions
-mod_szn_cat <- lm(scoville ~ season, data = sauces)
-summary(mod_szn_cat)
-mod_saucenum_cat <- lm(scoville ~ saucenum, data = sauces)
-mod_sauce_name_cat <- lm(scoville ~ sauce_name, data = sauces)
+mod_sauce_number <- lm(scoville ~ sauce_number, data = sauces)
+mod_sauce_name <- lm(scoville ~ sauce_name, data = sauces)
 
-tidy_szn_cat <- tidy(mod_szn_cat, conf.int = TRUE)
-tidy_saucenum_cat <- tidy(mod_saucenum_cat, conf.int = TRUE)
-tidy_sauce_name_cat <- tidy(mod_sauce_name_cat, conf.int = TRUE)
+tidy_season <- tidy(mod_season, conf.int = TRUE)
+tidy_sauce_number <- tidy(mod_sauce_number, conf.int = TRUE)
+tidy_sauce_name <- tidy(mod_sauce_name, conf.int = TRUE)
 
 dplyr::bind_rows(
-	season = tidy_szn_cat,
-	saucenum = tidy_saucenum_cat,
-	sauce_name = tidy_sauce_name_cat, .id = "model") |>
+	season = tidy_season,
+	sauce_number = tidy_sauce_number,
+	sauce_name = tidy_sauce_name, .id = "model") |>
 	dplyr::mutate(
 		term = stringr::str_remove(term, model),
 		term = ifelse(term == "", model, term))
 
-> tidy(logistic_model, conf.int = TRUE, exponentiate = TRUE) |>
-	tidycat::tidy_categorical(logistic_model, exponentiate = TRUE)
-dplyr::select(-c(3:5))
 
 
 # Figure
 hist(sauces$scoville)
 
 
+
 # Function
 x <- c(450, 550, 600, 747, 1600)
+
 new_mean <- function(x) {
 	n <- length(x)
 	mean_val <- sum(x) / n
@@ -184,3 +185,15 @@ new_mean <- function(x) {
 
 new_mean(x = x)
 new_mean(x = c(450, 600, 1600))
+
+
+
+# Renv
+renv::init()
+renv::snapshot()
+source("renv/activate.R")
+
+
+
+# Creating an rnd
+usethis::use_readme_rnd
