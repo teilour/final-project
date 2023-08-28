@@ -12,8 +12,8 @@ library(broom)
 
 
 # Read in data to R
-sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
-view(sauce_data)
+sauces <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
+view(sauces)
 
 
 
@@ -27,10 +27,10 @@ sauces <- read_csv(here::here("data/raw/sauces.csv"),
 									 skip = 1, col_names = sauces_col) |>
 	mutate(sauce_number = factor(sauce_number, labels = (1:10)),
 				 season = factor(season, labels = c("Season 1", "Season 2", "Season 3", "Season 4", "Season 5",
-				 																	 "Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
-				 																	 "Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
-				 																	 "Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
-				 																	 "Season 21")))
+				 																	  "Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
+				 																	  "Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
+				 																	  "Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
+				 																	  "Season 21")))
 
 here::here("data", "raw", "sauces.csv")
 

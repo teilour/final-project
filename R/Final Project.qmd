@@ -1,7 +1,9 @@
 ---
 title: "Final Project"
 author: "Taylor Nguyen"
-format: html
+format:
+  html:
+    theme: yeti
 ---
 
 ```{r}
@@ -9,141 +11,111 @@ here::here()
 ```
 
 # Load packages
+
 ```{r}
 library(tidyverse)
 library(gtsummary)
 library(broom)
-
-sauces_col <- c("season", "sauce_number", "sauce_name", "scoville")
-sauces <- read_csv(here::here("data", "raw", "sauces.csv"),
-								 skip = 1, col_names = sauces_col) |>
-	mutate(saucenum = factor(sauce_number, labels = (1:10)),
-				 season = factor(season, labels = c("Season 1", "Season 2", "Season 3", "Season 4", "Season 5",
-																					"Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
-																					"Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
-																					"Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
-																					"Season 21")))
 ```
 
-# Renv
-renv::init()
-renv::snapshot()
-source("renv/activate.R")
-
-renv::restore()
-renv::status()
-
 # Read in data to R
-sauce_data <- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv")
-view(sauce_data)
 
-The sauces dataset involves Hot Ones sauces that have been tried over the 21 seasons and their Scoville Heat Unit.
-																					
+sauces \<- read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-08-08/sauces.csv") view(sauces)
+
+The sauces dataset involves Hot Ones sauces that have been tried over the 21 seasons and their Scoville Heat Units.
+
 # Customization of `tbl_summary()`
 
 ```{r}
-tbl_summary(
-	sauces,
-	by = season,
-	include = c(season, saucenum, sauce_name, scoville))
-```
-
-```{r}
+#| echo: FALSE
 #| label: tbl-one
 #| tbl-cap: "Hot Ones Sauces Over the Seasons"
+
+sauces_col <- c("season", "sauce_number", "sauce_name", "scoville")
+sauces <- read_csv(here::here("data/raw/sauces.csv"),
+									 skip = 1, col_names = sauces_col) |>
+	mutate(sauce_number = factor(sauce_number, labels = (1:10)),
+				 season = factor(season, labels = c("Season 1", "Season 2", "Season 3", "Season 4", "Season 5",
+				 																	  "Season 6", "Season 7", "Season 8", "Season 9", "Season 10",
+				 																	  "Season 11", "Season 12", "Season 13", "Season 14", "Season 15",
+				 																	  "Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
+				 																	  "Season 21")))
+
 table1 <- tbl_summary(
 	sauces,
 	by = season,
-	include = c(season, saucenum, sauce_name, scoville),
+	include = c(season, sauce_number, sauce_name, scoville),
 	label = list(
-		season ~ "Season",
-		seasonnum ~ "Number of Season",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name",
 		scoville ~ "Scoville"
-		),
-		missing_text = "Missing")
+	),
+	missing_text = "Missing")
 table1
 ```
-@tbl-one looks at different sauces used for each Hot Ones season.
 
-
-```{r}
-#| label: tbl-two
-#| tbl-cap: "Descriptive Statistics"
-table2 <- tbl_summary(
-	sauces,
-	by = season,
-	include = c(season, saucenum, sauce_name, scoville)) |>
-	add_overall(last = TRUE)
-table2
-```
+@tbl-one looks at different sauces used for each Hot Ones season and their Scoville Heat Unit.
 
 ```{r}
 #| label: fig-hist
 #| fig-cap: "This is a histogram of Hot Ones sauces"
 hist(sauces$scoville)
 ```
-@fig-hist contains a histogram of Hot Ones sauces and @tbl-one is a table of Hot Ones sauces over the seasons.
+@fig-hist is a histogram of the distribution of Scoville Heat Units in the sauces dataset.
+
+
+@fig-hist contains a histogram of Scoville Heat Units for the sauces dataset and @tbl-one is a table of Hot Ones sauces over the seasons and their Scoville Heat Unit.
 
 ```{r}
-scoville_szn <- inline_text(table1, variable = "Scoville", 
-                        						 column = "Season")
-scoville_saucename <- inline_text(table1, variable = "Scoville", 
-                        						 column = "Sauce Name")
+scoville_szn1 <- inline_text(table1, variable = "scoville", 
+                        						 column = "Season 1")
+scoville_szn2 <- inline_text(table1, variable = "scoville", 
+                        						 column = "Season 2")
 ```
-A greater proportion of season (`r scoville_szn`) than sauce name (`r scoville_saucename`) had more scoville.
 
-A greater proportion of season (`r inline_text(table1, variable = "Scoville", column = "Season")`) than sauce name (`r inline_text(table1, variable = "Scoville", column = "Sauce Name")`) had more scoville.
+A greater proportion of Season 2 (`r scoville_szn2`) than Season 1 (`r scoville_szn1`) had more Scoville Heat Units.
 
-There were `r 200 + 10` participants 
+There were `r 200 + 10` sauces over the Hot Ones seasons
 
 ```{r}
 scoville_avg <- mean(sauces$scoville, na.rm = TRUE)
 ```
-The average amount of scoville was 'r scoville_avg'
 
-sauce_stats <- list(n = nrow(sauces),
-										scoville_avg = mean(sauces$scoville))
-There were `r sauce_stats$n` sauces with a mean scoville of `r sauce_stats$scoville_avg`.
+The average amount of scoville was `r scoville_avg`
+
+stats <- list(n = nrow(sauces), scoville_avg = mean(sauces$scoville))
+
+There were `r stats$n` sauces with a mean Scoville of `r stats$scoville_avg`.
 
 ```{r}
-tbl_summary(
- 	sauces,
- 	by = season,
- 	include = c(season, saucenum, sauce_name, scoville),
- 	label = list(
- 		seasonnum ~ "Season Number",
- 		sauce_name ~ "Sauce Name",
- 		scoville ~ "Scoville") |>
- 	add_p(test = list(all_continuous() ~ "t.test",
-										all_categorical() ~ "chisq.test")) |>
-	add_overall(col_label = "**Total**") |>
- 	bold_labels() |>
- 	modify_footnote(update = everything() ~ NA) |>
- 	modify_header(label = "**Variable**"), p.value(label = "**P**"))
+inline_text(table1, variable = "scoville", column = "Season 12")
 ```
- 	
+Season 12 had a median Scoville Heat Unit of 60,500. 
+
 # Univariate regression
+
 ```{r}
 #| label: regress
 #| tbl-cap: "Regression Results"
 regress1 <- tbl_uvregression(
 	sauces,
 	y = scoville,
-	include = c(season, saucenum, sauce_name, scoville),
+	include = c(season, sauce_number, sauce_name, scoville),
 	method = lm)
 regress1
 ```
-@regress is a univariate regression for the sauces dataset	
-	
+
+@regress is a univariate regression for the sauces dataset
+
 # Multivariable regressions
+
 ```{r}
-linear_model <- lm(scoville ~ season + saucenum + sauce_name,
+linear_model <- lm(scoville ~ season + sauce_number + sauce_name,
 									 data = sauces)
 ```
 
-```{r}									 
-linear_model_int <- lm(scoville ~ season*saucenum + sauce_name,
+```{r}
+linear_model_int <- lm(scoville ~ season*sauce_number + sauce_name,
 											 data = sauces)
 ```
 
@@ -155,34 +127,48 @@ tbl_regression(
 	intercept = TRUE,
 	label = list(
 		season ~ "Season",
-		saucenum ~ "Sauce Number",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
 ```
 
 ```{r}
 tbl_no_int <- tbl_regression(
-  linear_model, 
-  intercept = TRUE,
-  label = list(
-  	season ~ "Season",
-		saucenum ~ "Sauce Number",
+	linear_model,
+	intercept = TRUE,
+	label = list(
+		season ~ "Season",
+		sauce_number ~ "Sauce Number",
 		sauce_name ~ "Sauce Name"
 	))
 
 tbl_int <- tbl_regression(
-   linear_model_int, 
-   intercept = TRUE,
-   label = list(
- 		season ~ "Season",
- 		saucenum ~ "Sauce Number",
- 		sauce_name ~ "Sauce Name",
- 		`season:sauce_name` ~ "Season/Sauce Name Interaction"
- 	))
+	linear_model_int,
+	intercept = TRUE,
+	label = list(
+		season ~ "Season",
+		sauce_number ~ "Sauce Number",
+		sauce_name ~ "Sauce Name",
+		`season:sauce_number` ~ "Season/Sauce Number interaction"
+	))
 ```
 
 ```{r}
 tbl_merge(list(tbl_no_int, tbl_int), 
           tab_spanner = c("**Model 1**", "**Model 2**"))
 ```
-	
+
+# Renv
+Initialize a project
+renv::init() 
+
+Track dependencies via a lockfile
+renv::snapshot() 
+
+source("renv/activate.R") 
+
+Restore an environment 
+renv::restore() 
+
+Status of project library 
+renv::status()
