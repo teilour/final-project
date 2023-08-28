@@ -196,4 +196,4 @@ source("renv/activate.R")
 
 
 # Creating an rnd
-usethis::use_readme_rnd
+usethis::use_readme_rmd
