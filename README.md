@@ -1,5 +1,5 @@
 # final-project
-Final project for EPI 590R
+Final Project README Author: Taylor Nguyen
 
 Please run Final_Project.R and then render Final.qmd
 
