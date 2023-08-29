@@ -8,6 +8,8 @@ install.packages("usethis")
 library(tidyverse)
 library(gtsummary)
 library(broom)
+library(here)
+library(ggplot2)
 
 
 
@@ -32,7 +34,15 @@ sauces <- read_csv(here::here("data/raw/sauces.csv"),
 				 																	  "Season 16", "Season 17", "Season 18", "Season 19", "Season 20",
 				 																	  "Season 21")))
 
-here::here("data", "raw", "sauces.csv")
+
+
+# Using the {here} package
+sauces <- read_csv(here::here("data", "raw", "sauces.csv"))
+
+p <- ggplot(sauces) + geom_point(aes(x = season, y = scoville))
+
+ggsave(plot = p,
+			 filename = here::here("images", "fig.png"))
 
 
 
@@ -132,8 +142,6 @@ scoville_table <- tbl_uvregression(
 )
 scoville_table
 
-
-inline_text(scoville_table, variable = "season")
 
 mod_season <- lm(scoville ~ season, data = sauces)
 summary(mod_season)

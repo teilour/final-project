@@ -1,18 +1,6 @@
-Run Final Project.R and then render Final Project.qmd
+Final Project README Author: Taylor Nguyen
 
-# Quarto Document
-Data description and its source: lines 22-24, 27
+Please run Final_Project.R and then render Final.qmd
 
-Table: lines 31-57
-Table caption: line 59
+In the Quarto Doc, the description can be found at the top. The cross reference and inline R codes are after Figure 1 and before the regression tables. 
 
-Figure: lines 61-66
-Figure caption: line 68
-
-Cross-reference to a table and figure: line 70
-
-In-line R code: lines 72-77; 83-85; 95-97
-In-line text: lines 79, 81, 87, 93, 99
-
-Regression table: lines 103-113; 131-144; 170-177
-Regression caption: line 115, 146, 179
